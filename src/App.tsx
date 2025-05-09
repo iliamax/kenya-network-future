@@ -17,6 +17,7 @@ import Events from "./pages/Events";
 import Membership from "./pages/Membership";
 import News from "./pages/News";
 import Contact from "./pages/Contact";
+import Resources from "./pages/Resources";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => {
                   <Route path="/events" element={<Events />} />
                   <Route path="/membership" element={<Membership />} />
                   <Route path="/news" element={<News />} />
+                  <Route path="/resources" element={<Resources />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

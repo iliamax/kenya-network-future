@@ -18,10 +18,10 @@ const Footer = () => {
   ];
   
   const resources = [
-    { name: "Network Security Guide", path: "#" },
-    { name: "IPv6 Migration Checklist", path: "#" },
-    { name: "ICT Policy Briefs", path: "#" },
-    { name: "Technical Documentation", path: "#" },
+    { name: "Network Security Guide", path: "/resources?category=Security" },
+    { name: "IPv6 Migration Checklist", path: "/resources?category=Technical" },
+    { name: "ICT Policy Briefs", path: "/resources?category=Policy" },
+    { name: "Technical Documentation", path: "/resources?category=Technical" },
   ];
 
   return (
@@ -89,8 +89,10 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-            <Button variant="outline" size="sm" className="mt-4 border-gray-600 text-gray-300 hover:text-white">
-              View All Resources
+            <Button variant="outline" size="sm" className="mt-4 border-gray-600 text-gray-300 hover:text-white" asChild>
+              <Link to="/resources">
+                View All Resources
+              </Link>
             </Button>
           </div>
           
