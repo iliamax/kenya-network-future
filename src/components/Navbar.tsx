@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -10,6 +10,7 @@ const Navbar = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { toast } = useToast();
+  const location = useLocation();
   
   // Toggle menu
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -62,6 +63,11 @@ const Navbar = () => {
     { name: "Contact", path: "/contact" }
   ];
 
+  // Check if a link is active
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 dark:bg-gray-900/80 shadow-md backdrop-blur-md' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,7 +90,11 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 to={link.path}
-                className="px-2 py-1 text-sm lg:text-base font-medium rounded-md text-gray-700 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400 transition-colors"
+                className={`px-2 py-1 text-sm lg:text-base font-medium rounded-md transition-colors ${
+                  isActive(link.path) 
+                    ? 'text-blue-600 dark:text-blue-400' 
+                    : 'text-gray-700 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400'
+                }`}
               >
                 {link.name}
               </Link>
@@ -123,7 +133,11 @@ const Navbar = () => {
             <Link
               key={link.name}
               to={link.path}
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100 dark:text-gray-200 dark:hover:text-blue-400 dark:hover:bg-gray-800"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                isActive(link.path)
+                  ? 'text-blue-600 bg-gray-100 dark:text-blue-400 dark:bg-gray-800'
+                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100 dark:text-gray-200 dark:hover:text-blue-400 dark:hover:bg-gray-800'
+              }`}
               onClick={() => setIsOpen(false)}
             >
               {link.name}
