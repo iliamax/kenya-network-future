@@ -18,6 +18,9 @@ import Membership from "./pages/Membership";
 import News from "./pages/News";
 import Contact from "./pages/Contact";
 import Resources from "./pages/Resources";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CookiePolicy from "./pages/CookiePolicy";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -44,6 +47,9 @@ const App = () => {
                   <Route path="/news" element={<News />} />
                   <Route path="/resources" element={<Resources />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
+                  <Route path="/cookie-policy" element={<CookiePolicy />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>

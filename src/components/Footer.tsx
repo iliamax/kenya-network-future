@@ -129,15 +129,15 @@ const Footer = () => {
               &copy; {year} Network Service Providers Association of Kenya (NESPAK). All rights reserved.
             </p>
             <div className="flex space-x-4 text-sm">
-              <a href="#" className="text-gray-500 hover:text-blue-400">Privacy Policy</a>
-              <a href="#" className="text-gray-500 hover:text-blue-400">Terms of Service</a>
-              <a href="#" className="text-gray-500 hover:text-blue-400">Cookie Policy</a>
+              <Link to="/privacy-policy" className="text-gray-500 hover:text-blue-400">Privacy Policy</Link>
+              <Link to="/terms-of-service" className="text-gray-500 hover:text-blue-400">Terms of Service</Link>
+              <Link to="/cookie-policy" className="text-gray-500 hover:text-blue-400">Cookie Policy</Link>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Add ChatBot component */}
+      {/* ChatBot component */}
       <ChatBot />
     </footer>
   );
