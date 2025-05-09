@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Globe, Server, Network, Cloud, ArrowRight } from 'lucide-react';
+import { Check, Globe, Server, Network, Cloud, ArrowRight, Users } from 'lucide-react';
 import PageLayout from '@/components/PageLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
