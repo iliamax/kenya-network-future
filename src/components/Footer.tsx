@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, ArrowRight, Github, Linkedin, Twitter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ChatBot from './ChatBot';
 
 const Footer = () => {
   const year = new Date().getFullYear();
@@ -135,6 +136,9 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      
+      {/* Add ChatBot component */}
+      <ChatBot />
     </footer>
   );
 };
