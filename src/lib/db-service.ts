@@ -155,7 +155,7 @@ export const fetchSiteConfig = async (): Promise<SiteConfig> => {
       secondaryColor: '#2b6cb0',
       accentColor: '#4299e1',
       logoUrl: '/logo.svg',
-      bannerText: 'Welcome to NESPAK - Connecting Kenya's Internet Service Providers'
+      bannerText: "Welcome to NESPAK - Connecting Kenya's Internet Service Providers"
     };
   } catch (error) {
     console.error('Error fetching site config:', error);
