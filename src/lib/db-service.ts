@@ -1,7 +1,9 @@
-
 // This file provides interfaces with external database services
 // It acts as a bridge between the frontend and the backend admin dashboard
 
+import mysql from 'mysql2/promise';
+
+// Database interfaces - keep these the same
 interface AdminEvent {
   id: string;
   title: string;
@@ -38,125 +40,127 @@ interface SiteConfig {
   bannerText?: string;
 }
 
-// Mock API endpoints - would be replaced with actual API endpoints
-const API_ENDPOINTS = {
-  events: '/api/events',
-  news: '/api/news',
-  resources: '/api/resources', 
-  config: '/api/site-config'
+// Database configuration
+const dbConfig = {
+  host: 'localhost', // Change to your MySQL host
+  user: 'root',      // Change to your MySQL username
+  password: '',      // Change to your MySQL password
+  database: 'nespak_admin', // Change to your database name
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 };
 
-// Fetch events from external admin database
+// Create a connection pool
+const pool = mysql.createPool(dbConfig);
+
+// Helper function to execute queries
+async function executeQuery<T>(sql: string, values: any[] = []): Promise<T> {
+  try {
+    const [rows] = await pool.execute(sql, values);
+    return rows as T;
+  } catch (error) {
+    console.error('Database query error:', error);
+    throw error;
+  }
+}
+
+// Fetch events from database
 export const fetchEvents = async (): Promise<AdminEvent[]> => {
   try {
-    // In production, this would be an actual API call
-    // For now, we're simulating an API response
-    console.log("Fetching events from external admin database");
+    console.log("Fetching events from database");
     
-    // Simulate a successful API call with mock data
-    // In a real implementation, this would be:
-    // const response = await fetch(API_ENDPOINTS.events);
-    // return await response.json();
+    const events = await executeQuery<AdminEvent[]>(`
+      SELECT 
+        id, 
+        title, 
+        DATE_FORMAT(date, '%Y-%m-%d') as date, 
+        description, 
+        location, 
+        image_url as imageUrl 
+      FROM events
+    `);
     
-    return [
-      {
-        id: '1',
-        title: 'Annual ISP Conference',
-        date: '2025-07-15',
-        description: 'Join us for the largest gathering of Kenyan ISPs and telecoms.',
-        location: 'Nairobi Convention Center',
-        imageUrl: '/events/conference.jpg'
-      },
-      {
-        id: '2',
-        title: 'Cybersecurity Workshop',
-        date: '2025-08-05',
-        description: 'Learn the latest in network security protocols and best practices.',
-        location: 'Tech Hub Mombasa',
-        imageUrl: '/events/workshop.jpg'
-      }
-    ];
+    return events;
   } catch (error) {
     console.error('Error fetching events:', error);
     return [];
   }
 };
 
-// Fetch news from external admin database
+// Fetch news from database
 export const fetchNews = async (): Promise<NewsItem[]> => {
   try {
-    console.log("Fetching news from external admin database");
+    console.log("Fetching news from database");
     
-    // Mock data - would be replaced with actual API call
-    return [
-      {
-        id: '1',
-        title: 'NESPAK Partners with Government on Digital Inclusion Initiative',
-        date: '2025-05-05',
-        summary: 'A new partnership aims to bring internet access to rural areas.',
-        content: 'The Network Service Providers Association of Kenya has announced a landmark partnership...',
-        imageUrl: '/news/digital-inclusion.jpg',
-        author: 'NESPAK Comms Team'
-      },
-      {
-        id: '2',
-        title: 'New Regulatory Framework Announced',
-        date: '2025-04-22',
-        summary: 'Updated guidelines for ISPs operating in Kenya.',
-        content: 'The Communications Authority of Kenya has published new guidelines that will affect...',
-        imageUrl: '/news/regulations.jpg',
-        author: 'John Mwangi'
-      }
-    ];
+    const news = await executeQuery<NewsItem[]>(`
+      SELECT 
+        id, 
+        title, 
+        DATE_FORMAT(date, '%Y-%m-%d') as date, 
+        summary, 
+        content, 
+        image_url as imageUrl, 
+        author 
+      FROM news
+    `);
+    
+    return news;
   } catch (error) {
     console.error('Error fetching news:', error);
     return [];
   }
 };
 
-// Fetch resources from external admin database
+// Fetch resources from database
 export const fetchResources = async (): Promise<Resource[]> => {
   try {
-    console.log("Fetching resources from external admin database");
+    console.log("Fetching resources from database");
     
-    // Mock data - would be replaced with actual API call
-    return [
-      {
-        id: '1',
-        title: 'ISP Licensing Guide',
-        description: 'Complete guide to obtaining and maintaining ISP licenses in Kenya.',
-        url: '/resources/licensing-guide.pdf',
-        category: 'Regulation',
-        type: 'PDF'
-      },
-      {
-        id: '2',
-        title: 'Network Security Toolkit',
-        description: 'Collection of tools and resources for securing ISP networks.',
-        url: '/resources/security-toolkit.zip',
-        category: 'Security',
-        type: 'ZIP'
-      }
-    ];
+    const resources = await executeQuery<Resource[]>(`
+      SELECT 
+        id, 
+        title, 
+        description, 
+        url, 
+        category, 
+        type 
+      FROM resources
+    `);
+    
+    return resources;
   } catch (error) {
     console.error('Error fetching resources:', error);
     return [];
   }
 };
 
-// Fetch site configuration from external admin database
+// Fetch site configuration from database
 export const fetchSiteConfig = async (): Promise<SiteConfig> => {
   try {
-    console.log("Fetching site configuration from external admin database");
+    console.log("Fetching site configuration from database");
     
-    // Mock data - would be replaced with actual API call
-    return {
-      primaryColor: '#1a365d',
-      secondaryColor: '#2b6cb0',
-      accentColor: '#4299e1',
-      logoUrl: '/logo.svg',
-      bannerText: "Welcome to NESPAK - Connecting Kenya's Internet Service Providers"
-    };
+    const configs = await executeQuery<SiteConfig[]>(`
+      SELECT 
+        primary_color as primaryColor, 
+        secondary_color as secondaryColor, 
+        accent_color as accentColor, 
+        logo_url as logoUrl, 
+        banner_text as bannerText 
+      FROM site_config 
+      LIMIT 1
+    `);
+    
+    if (configs.length === 0) {
+      return {
+        primaryColor: '#1a365d',
+        secondaryColor: '#2b6cb0',
+        accentColor: '#4299e1',
+        logoUrl: '/logo.svg'
+      };
+    }
+    
+    return configs[0];
   } catch (error) {
     console.error('Error fetching site config:', error);
     return {
@@ -172,15 +176,15 @@ export const fetchSiteConfig = async (): Promise<SiteConfig> => {
 
 export const updateEvent = async (event: AdminEvent): Promise<boolean> => {
   try {
-    console.log("Updating event in external admin database", event);
-    // In production, this would be an API call:
-    // await fetch(`${API_ENDPOINTS.events}/${event.id}`, {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(event)
-    // });
+    console.log("Updating event in database", event);
+    
+    await executeQuery(
+      `UPDATE events 
+       SET title = ?, date = ?, description = ?, location = ?, image_url = ?
+       WHERE id = ?`,
+      [event.title, event.date, event.description, event.location, event.imageUrl, event.id]
+    );
+    
     return true;
   } catch (error) {
     console.error('Error updating event:', error);
@@ -190,8 +194,15 @@ export const updateEvent = async (event: AdminEvent): Promise<boolean> => {
 
 export const updateNews = async (newsItem: NewsItem): Promise<boolean> => {
   try {
-    console.log("Updating news item in external admin database", newsItem);
-    // Would be an API call in production
+    console.log("Updating news item in database", newsItem);
+    
+    await executeQuery(
+      `UPDATE news 
+       SET title = ?, date = ?, summary = ?, content = ?, image_url = ?, author = ?
+       WHERE id = ?`,
+      [newsItem.title, newsItem.date, newsItem.summary, newsItem.content, newsItem.imageUrl, newsItem.author, newsItem.id]
+    );
+    
     return true;
   } catch (error) {
     console.error('Error updating news item:', error);
@@ -201,8 +212,15 @@ export const updateNews = async (newsItem: NewsItem): Promise<boolean> => {
 
 export const updateResource = async (resource: Resource): Promise<boolean> => {
   try {
-    console.log("Updating resource in external admin database", resource);
-    // Would be an API call in production
+    console.log("Updating resource in database", resource);
+    
+    await executeQuery(
+      `UPDATE resources 
+       SET title = ?, description = ?, url = ?, category = ?, type = ?
+       WHERE id = ?`,
+      [resource.title, resource.description, resource.url, resource.category, resource.type, resource.id]
+    );
+    
     return true;
   } catch (error) {
     console.error('Error updating resource:', error);
@@ -212,8 +230,18 @@ export const updateResource = async (resource: Resource): Promise<boolean> => {
 
 export const updateSiteConfig = async (config: Partial<SiteConfig>): Promise<boolean> => {
   try {
-    console.log("Updating site configuration in external admin database", config);
-    // Would be an API call in production
+    console.log("Updating site configuration in database", config);
+    
+    // Get existing config first
+    const existingConfig = await fetchSiteConfig();
+    const updatedConfig = { ...existingConfig, ...config };
+    
+    await executeQuery(
+      `UPDATE site_config 
+       SET primary_color = ?, secondary_color = ?, accent_color = ?, logo_url = ?, banner_text = ?`,
+      [updatedConfig.primaryColor, updatedConfig.secondaryColor, updatedConfig.accentColor, updatedConfig.logoUrl, updatedConfig.bannerText]
+    );
+    
     return true;
   } catch (error) {
     console.error('Error updating site config:', error);
@@ -225,8 +253,14 @@ export const updateSiteConfig = async (config: Partial<SiteConfig>): Promise<boo
 
 export const createEvent = async (event: Omit<AdminEvent, 'id'>): Promise<boolean> => {
   try {
-    console.log("Creating new event in external admin database", event);
-    // Would be an API call in production
+    console.log("Creating new event in database", event);
+    
+    await executeQuery(
+      `INSERT INTO events (id, title, date, description, location, image_url)
+       VALUES (UUID(), ?, ?, ?, ?, ?)`,
+      [event.title, event.date, event.description, event.location, event.imageUrl]
+    );
+    
     return true;
   } catch (error) {
     console.error('Error creating event:', error);
@@ -236,8 +270,14 @@ export const createEvent = async (event: Omit<AdminEvent, 'id'>): Promise<boolea
 
 export const createNewsItem = async (newsItem: Omit<NewsItem, 'id'>): Promise<boolean> => {
   try {
-    console.log("Creating new news item in external admin database", newsItem);
-    // Would be an API call in production
+    console.log("Creating new news item in database", newsItem);
+    
+    await executeQuery(
+      `INSERT INTO news (id, title, date, summary, content, image_url, author)
+       VALUES (UUID(), ?, ?, ?, ?, ?, ?)`,
+      [newsItem.title, newsItem.date, newsItem.summary, newsItem.content, newsItem.imageUrl, newsItem.author]
+    );
+    
     return true;
   } catch (error) {
     console.error('Error creating news item:', error);
@@ -247,8 +287,14 @@ export const createNewsItem = async (newsItem: Omit<NewsItem, 'id'>): Promise<bo
 
 export const createResource = async (resource: Omit<Resource, 'id'>): Promise<boolean> => {
   try {
-    console.log("Creating new resource in external admin database", resource);
-    // Would be an API call in production
+    console.log("Creating new resource in database", resource);
+    
+    await executeQuery(
+      `INSERT INTO resources (id, title, description, url, category, type)
+       VALUES (UUID(), ?, ?, ?, ?, ?)`,
+      [resource.title, resource.description, resource.url, resource.category, resource.type]
+    );
+    
     return true;
   } catch (error) {
     console.error('Error creating resource:', error);
@@ -260,8 +306,10 @@ export const createResource = async (resource: Omit<Resource, 'id'>): Promise<bo
 
 export const deleteEvent = async (id: string): Promise<boolean> => {
   try {
-    console.log("Deleting event from external admin database", id);
-    // Would be an API call in production
+    console.log("Deleting event from database", id);
+    
+    await executeQuery(`DELETE FROM events WHERE id = ?`, [id]);
+    
     return true;
   } catch (error) {
     console.error('Error deleting event:', error);
@@ -271,8 +319,10 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
 
 export const deleteNewsItem = async (id: string): Promise<boolean> => {
   try {
-    console.log("Deleting news item from external admin database", id);
-    // Would be an API call in production
+    console.log("Deleting news item from database", id);
+    
+    await executeQuery(`DELETE FROM news WHERE id = ?`, [id]);
+    
     return true;
   } catch (error) {
     console.error('Error deleting news item:', error);
@@ -282,8 +332,10 @@ export const deleteNewsItem = async (id: string): Promise<boolean> => {
 
 export const deleteResource = async (id: string): Promise<boolean> => {
   try {
-    console.log("Deleting resource from external admin database", id);
-    // Would be an API call in production
+    console.log("Deleting resource from database", id);
+    
+    await executeQuery(`DELETE FROM resources WHERE id = ?`, [id]);
+    
     return true;
   } catch (error) {
     console.error('Error deleting resource:', error);
@@ -296,13 +348,30 @@ export const authenticateAdmin = async (username: string, password: string): Pro
   try {
     console.log("Authenticating admin user");
     
-    // This is a mock implementation
-    // In production, this would validate credentials against a secure backend
-    if (username === "admin" && password === "password") {
-      return {
-        success: true,
-        token: "mock-jwt-token"
-      };
+    // In a real application, you would:
+    // 1. Get the user from the database
+    // 2. Compare the hashed password
+    // 3. Generate a JWT token
+    
+    const users = await executeQuery<{id: string; username: string; password_hash: string}[]>(
+      `SELECT id, username, password_hash FROM admin_users WHERE username = ?`,
+      [username]
+    );
+    
+    // For demo purposes, we're using a simple check
+    // In production, use proper password hashing (bcrypt, argon2, etc.)
+    if (users.length > 0) {
+      // IMPORTANT: This is for demonstration only!
+      // In a real app, you must use proper password verification:
+      // const passwordMatches = await bcrypt.compare(password, users[0].password_hash);
+      const passwordMatches = password === "password"; // Replace with proper verification
+      
+      if (passwordMatches) {
+        return {
+          success: true,
+          token: "mock-jwt-token" // Replace with actual JWT generation
+        };
+      }
     }
     
     return {
